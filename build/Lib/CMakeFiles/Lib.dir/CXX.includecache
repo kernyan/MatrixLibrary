@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/victor/Documents/Source/C++/MatrixSolver/Lib/src/matrix.cpp
+matrix.h
+/home/victor/Documents/Source/C++/MatrixSolver/Lib/src/matrix.h
+
+/home/victor/Documents/Source/C++/MatrixSolver/Lib/src/matrix.h
+vector
+-
+

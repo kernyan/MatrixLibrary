@@ -1,0 +1,14 @@
+/home/victor/Documents/Source/C++/MatrixSolver/build/CMakeFiles/edit_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/CMakeFiles/rebuild_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Lib/CMakeFiles/edit_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Lib/CMakeFiles/Lib.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Lib/CMakeFiles/rebuild_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/main/CMakeFiles/edit_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/main/CMakeFiles/LinearSolver.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/main/CMakeFiles/rebuild_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/CMakeFiles/edit_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/CMakeFiles/gtest.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/CMakeFiles/rebuild_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/UnitTests/CMakeFiles/edit_cache.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/UnitTests/CMakeFiles/UnitTests.dir
+/home/victor/Documents/Source/C++/MatrixSolver/build/Test/UnitTests/CMakeFiles/rebuild_cache.dir
