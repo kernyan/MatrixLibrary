@@ -1,2 +1,5 @@
 # exclude build folder
 build
+
+# exclude swp files
+*.swp
