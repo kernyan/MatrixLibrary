@@ -2,16 +2,58 @@
 
 #include <vector>
 #include <initializer_list>
+#include <array>
+#include <iostream>
+
 using namespace std;
 
-template <typename T>
+
+template<int N>  
+struct MatrixSlice{
+// functor to map dimensions to vector index
+
+  int size_;
+  int start_;
+
+  template<typename ...Dims>
+  MatrixSlice(Dims... dims);
+
+  array<int, N> extents;
+  array<int, N> strides;
+
+  template<typename ...Dims>
+  int operator()(Dims... dims);
+};
+
+
+namespace matrixImpl{ 
+  template<int N>
+  void compute_strides(MatrixSlice<N> &ms);
+}
+
+
+template<int N>
+template<typename ...Dims>
+inline MatrixSlice<N>::MatrixSlice(Dims... dims) : 
+  extents {int (dims)...}
+{
+  matrixImpl::compute_strides(*this);
+}  
+
+
+template <typename T, int N>
 class Matrix{
 
   public:
 
+    MatrixSlice<N> desc_;
     Matrix() = default;
 
-    Matrix(int dim);
+    template<typename ...Dims>
+    Matrix(Dims... dims) :
+      desc_(dims...){
+      data_.reserve(desc_.size_);
+    }
 
     // explicit Matrix(int dim);
     // Matrix (double dim) = delete;
@@ -20,14 +62,61 @@ class Matrix{
     int size() const {return data_.size();};
     vector<T>& data() {return data_;};
 
+    void info();
+
   private:
 
     vector<T> data_;
 };
 
 
-template<typename T>
-Matrix<T>& operator<<(Matrix<T>& Mat, T value);
+template<typename T, int N>
+Matrix<T,N>& operator<<(Matrix<T,N>& Mat, T value){
+  Mat.data().push_back(value);
+  return Mat;
+}
 
-template<typename T>
-Matrix<T>& operator,(Matrix<T>& Mat, T value);
+template<typename T, int N>
+Matrix<T,N>& operator,(Matrix<T,N>& Mat, T value){
+  Mat << value;
+  return Mat;
+}
+
+
+template<typename T, int N>
+void Matrix<T,N>::info(){
+  cout << "extents: ";
+  for (auto &i : desc_.extents){
+    cout << i << ", ";
+  }
+  cout << endl;
+  cout << "strides: ";
+  for (auto &i : desc_.strides){
+    cout << i << ", ";
+  }
+  cout << endl;
+  cout << "elements: ";
+  for (auto &i : data_){
+    cout << i << ", ";
+  }
+  cout << endl;
+}
+
+/* matrix implementation namespace for functions 
+ * used to prepare Matrix and supply operations.
+ * Should not be exposed to main()
+ */
+namespace matrixImpl{
+
+template<int N>
+void compute_strides(MatrixSlice<N> &ms){
+  ms.start_ = 0;
+  int sizeTotal = 1;
+  for (int i = N-1;i>=0;--i){
+    ms.strides[i] = sizeTotal; 
+    sizeTotal *= ms.extents[i];
+  }
+  ms.size_ = sizeTotal;
+}  
+
+}
