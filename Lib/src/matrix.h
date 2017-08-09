@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <array>
 #include <iostream>
+#include <numeric>
 
 using namespace std;
 
@@ -15,6 +16,7 @@ struct MatrixSlice{
   int size_;
   int start_;
 
+  // TODO: default constructor?
   template<typename ...Dims>
   MatrixSlice(Dims... dims);
 
@@ -25,6 +27,14 @@ struct MatrixSlice{
   int operator()(Dims... dims);
 };
 
+template<int N>
+template<typename ...Dims>
+int MatrixSlice<N>::operator()(Dims... dims){
+  // TODO: check to enforce Dims in bound
+  int argc[N] {int (dims)...};
+  return start_ + inner_product(argc, argc+N,
+      strides.begin(),int{0});
+}
 
 namespace matrixImpl{ 
   template<int N>
@@ -38,15 +48,23 @@ inline MatrixSlice<N>::MatrixSlice(Dims... dims) :
   extents {int (dims)...}
 {
   matrixImpl::compute_strides(*this);
-}  
+}
 
+template<typename T, int N>
+class MatrixBase{
+  
+  public:
+    vector<T>* Data() = 0;
+
+  protected:
+    MatrixSlice<N> desc_;
+};
 
 template <typename T, int N>
-class Matrix{
+class Matrix{ 
 
   public:
 
-    MatrixSlice<N> desc_;
     Matrix() = default;
 
     template<typename ...Dims>
@@ -64,8 +82,14 @@ class Matrix{
 
     void info();
 
+    template<typename ...Dims>
+    T& operator()(Dims... dims){
+      return *(data_.begin() + desc_(dims...));
+    }
+
   private:
 
+    MatrixSlice<N> desc_;
     vector<T> data_;
 };
 

@@ -15,6 +15,22 @@ int main(int argc, char *argv[]){
 //  EXPECT_EQ(A.size(), 5);
 //}
 
+class MatrixTest : public ::testing::Test{
+  protected:
+    virtual void SetUp(){
+      Mat = Matrix<int, 3>(2,3,5);
+      Mat << 1,2,3,4,5,
+             2,3,4,5,6,
+             7,8,1,2,3,
+
+             2,4,6,8,0,
+             4,6,8,0,2,
+             6,8,0,9,4;
+    };
+
+    Matrix<int,3> Mat;
+};
+
 TEST(Matrix, Stream_Operator){
   
   Matrix<int,1> A(9);
@@ -36,14 +52,19 @@ TEST(Matrix, MatrixSlice_ExtentInit){
       MatSlice.strides.begin()+3, Ans2.begin()));
 }
 
-//TEST(Matrix, Matrix_MultiDimensionInit){
-//  Matrix<int,3> A(2,3,5);
-//  A << 1,2,3,4,5,
-//       2,3,4,5,6,
-//       7,8,1,2,3,
-//
-//       2,4,6,8,0,
-//       4,6,8,0,2,
-//       6,8,0,2,4;
-//  A.info();
-//}
+TEST(Matrix, Matrix_MultiDimensionAccess){
+  Matrix<int,3> A(2,3,5);
+  A << 1,2,3,4,5,
+       2,3,4,5,6,
+       7,8,1,2,3,
+
+       2,4,6,8,0,
+       4,6,8,0,2,
+       6,8,0,9,4;
+  EXPECT_EQ(A(1,2,3), 9);
+}
+
+TEST_F(MatrixTest, Matrix_ReplaceValue){
+  Mat(1,2,3) = 99;
+  EXPECT_EQ(Mat(1,2,3), 99); 
+}
