@@ -40,14 +40,12 @@ int MatrixSlice<N>::operator()(Dims... dims){
 namespace matrixImpl{ 
   template<int N>
   void compute_strides(MatrixSlice<N> &ms);
-}
 
-
-namespace matrixImpl{ 
   template<int K, int N>
   void slice_dim(int i, const MatrixSlice<N+1>& in_s,
       MatrixSlice<N>& out_s);
 }
+
 
 template<int N>
 template<typename ...Dims>
@@ -98,6 +96,7 @@ class Matrix : public MatrixBase<T,N>{
     }
 
     MatrixRef<T,N-1> row(int i);
+    MatrixRef<T,N-1> column(int i);
 
   private:
 
@@ -110,6 +109,13 @@ MatrixRef<T,N-1> Matrix<T,N>::row(int i) {
   MatrixSlice<N-1> row;
   matrixImpl::slice_dim<0>(i,desc_, row);
   return {row, data()};
+}
+
+template<typename T, int N>
+MatrixRef<T,N-1> Matrix<T,N>::column(int i) {
+  MatrixSlice<N-1> col;
+  matrixImpl::slice_dim<1>(i,desc_, col);
+  return {col, data()};
 }
 
 template<typename T, int N>

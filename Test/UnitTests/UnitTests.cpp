@@ -73,3 +73,8 @@ TEST_F(MatrixTest, Matrix_RowAccess){
   auto MatRef = Mat.row(1);
   EXPECT_EQ(MatRef(2,3), 9);
 }
+
+TEST_F(MatrixTest, Matrix_ColumnAccess){
+  auto MatRef = Mat.column(1);
+  EXPECT_EQ(MatRef(1,2), 8);
+}
