@@ -37,8 +37,8 @@ TEST(Matrix, Stream_Operator){
   A << 1,2,3,4,5,6,7,8,9;
   vector<int> Ans{1,2,3,4,5,6,7,8,9};
 
-  EXPECT_TRUE(equal(A.data().begin(),
-    A.data().begin()+9, Ans.begin()));
+  EXPECT_TRUE(equal(A.data(),
+    A.data()+9, Ans.begin()));
 }
 
 TEST(Matrix, MatrixSlice_ExtentInit){
@@ -67,4 +67,9 @@ TEST(Matrix, Matrix_MultiDimensionAccess){
 TEST_F(MatrixTest, Matrix_ReplaceValue){
   Mat(1,2,3) = 99;
   EXPECT_EQ(Mat(1,2,3), 99); 
+}
+
+TEST_F(MatrixTest, Matrix_RowAccess){
+  auto MatRef = Mat.row(1);
+  EXPECT_EQ(MatRef(2,3), 9);
 }
