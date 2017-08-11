@@ -6,6 +6,7 @@
 #include <iostream>
 #include <numeric>
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -71,6 +72,7 @@ class MatrixBase{
 
     virtual int size() const = 0;
     virtual T* data() = 0;
+    virtual int start() const = 0;
 };
 
 template <typename T, int N>
@@ -103,6 +105,10 @@ class Matrix : public MatrixBase<T,N>{
 
     MatrixRef<T,N-1> row(int i);
     MatrixRef<T,N-1> column(int i);
+
+    virtual int start() const override final{
+      return desc_.start_;
+    }
 
   private:
 
@@ -148,11 +154,33 @@ class MatrixRef : public MatrixBase<T,N>{
     MatrixRef<T,N-1> row(int i);
     MatrixRef<T,N-1> column(int i);
 
+    virtual int start() const override final{
+      return desc_.start_;
+    }
+
+    void GetString(string& str);
+
   private:
 
     MatrixSlice<N> desc_;
     T* ptr_;
 };
+
+template<typename T, int N>
+void MatrixRef<T,N>::GetString(string& str){
+  for (int i=0;i<N;++i){
+    str.insert(size_t{0}, "{");
+    row(i).GetString(str);
+    str += "}";
+  }
+}
+
+template<>
+void MatrixRef<int,1>::GetString(string& str){
+  for (int i=0;i<size();++i){
+    str += *(data()+start()) + ",";
+  }
+}
 
 template<typename T, int N>
 MatrixRef<T,N-1> MatrixRef<T,N>::row(int i){

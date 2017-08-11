@@ -110,3 +110,14 @@ TEST_F(MatrixTest, Matrix_Print){
     "}\n";
   //EXPECT_EQ(Mat.print(),Ans);
 }
+
+TEST_F(MatrixTest, MatrixBase_Start){
+  EXPECT_EQ(Mat.start(),0);
+  EXPECT_EQ(*(Mat.data() + Mat.start()),1);
+  auto MatRef = Mat.row(1);
+  EXPECT_EQ(*(MatRef.data() + MatRef.start()),2);
+  EXPECT_EQ(MatRef.start(),15);
+  auto MatRef2 = MatRef.row(2);
+  EXPECT_EQ(*(MatRef2.data() + MatRef2.start()),6);
+  EXPECT_EQ(MatRef2.start(),25);
+}
