@@ -26,6 +26,7 @@ struct MatrixSlice{
 
   template<typename ...Dims>
   int operator()(Dims... dims);
+  int size() const;
 };
 
 template<int N>
@@ -35,6 +36,11 @@ int MatrixSlice<N>::operator()(Dims... dims){
   int argc[N] {int (dims)...};
   return start_ + inner_product(argc, argc+N,
       strides.begin(),int{0});
+}
+
+template<int N>
+inline int MatrixSlice<N>::size() const {
+  return accumulate(extents.begin(),extents.end(),1,multiplies<int>());
 }
 
 namespace matrixImpl{ 
@@ -129,7 +135,7 @@ class MatrixRef : public MatrixBase<T,N>{
       ptr_(ptr) 
       {};
 
-    virtual int size() const override {return 999;}; // TODO fix
+    virtual int size() const override {return desc_.size();};
     virtual T* data() override {return ptr_;};
 
     void info();
@@ -139,11 +145,28 @@ class MatrixRef : public MatrixBase<T,N>{
       return *(data() + desc_(dims...));
     }
 
+    MatrixRef<T,N-1> row(int i);
+    MatrixRef<T,N-1> column(int i);
+
   private:
 
     MatrixSlice<N> desc_;
     T* ptr_;
 };
+
+template<typename T, int N>
+MatrixRef<T,N-1> MatrixRef<T,N>::row(int i){
+  MatrixSlice<N-1> row;
+  matrixImpl::slice_dim<0>(i, desc_, row);
+  return {row, data()};
+}
+
+template<typename T, int N>
+MatrixRef<T,N-1> MatrixRef<T,N>::column(int i) {
+  MatrixSlice<N-1> col;
+  matrixImpl::slice_dim<1>(i,desc_, col);
+  return {col, data()};
+}
 
 template<typename T, int N>
 Matrix<T,N>& operator<<(Matrix<T,N>& Mat, T value){
@@ -197,7 +220,7 @@ void compute_strides(MatrixSlice<N> &ms){
 template<int K, int N>
 void slice_dim(int i, const MatrixSlice<N+1>& in_s,
     MatrixSlice<N>& out_s){
-  out_s.start_ = i * in_s.strides[K];
+  out_s.start_ = in_s.start_ + i * in_s.strides[K];
   std::copy(in_s.extents.begin()+1,in_s.extents.end(),
       out_s.extents.begin());
   std::copy(in_s.strides.begin()+1,in_s.strides.end(),

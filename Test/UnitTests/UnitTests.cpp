@@ -2,18 +2,20 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <iostream>
-
+#include <string>
 
 int main(int argc, char *argv[]){
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }
 
-//TEST(Matrix, Dimension_Constructor){
-//
-//  Matrix<int> A(5);
-//  EXPECT_EQ(A.size(), 5);
-//}
+TEST(Matrix, Dimension_Constructor){
+
+  Matrix<int, 1> A(5);
+  EXPECT_EQ(A.size(), 0);
+  A << 1,2,3,4,5;
+  EXPECT_EQ(A.size(), 5);
+}
 
 class MatrixTest : public ::testing::Test{
   protected:
@@ -64,6 +66,13 @@ TEST(Matrix, Matrix_MultiDimensionAccess){
   EXPECT_EQ(A(1,2,3), 9);
 }
 
+TEST(Matrix, Matrix_OneDimensionedOneElem){
+  Matrix<int,1> A(2);
+  A << 99,100;
+  auto A2 = A.row(0);
+  EXPECT_EQ(A2.size(),1);
+}
+
 TEST_F(MatrixTest, Matrix_ReplaceValue){
   Mat(1,2,3) = 99;
   EXPECT_EQ(Mat(1,2,3), 99); 
@@ -74,7 +83,30 @@ TEST_F(MatrixTest, Matrix_RowAccess){
   EXPECT_EQ(MatRef(2,3), 9);
 }
 
+TEST_F(MatrixTest, MatrixRef_RowAccess){
+  auto MatRef = Mat.row(1);
+  auto MatRef2 = MatRef.row(2);
+  EXPECT_EQ(MatRef2(3), 9);
+}
+
 TEST_F(MatrixTest, Matrix_ColumnAccess){
   auto MatRef = Mat.column(1);
   EXPECT_EQ(MatRef(1,2), 8);
+}
+
+TEST_F(MatrixTest, Matrix_Print){
+  string Ans =
+    "{\n"
+    "  {\n"
+    "    {1,2,3,4,5}\n"
+    "    {2,3,4,5,6}\n"
+    "    {7,8,1,2,3}\n"
+    "  }\n"
+    "  {\n"
+    "    {2,4,6,8,0}\n"
+    "    {4,6,8,0,2}\n"
+    "    {6,8,0,9,4}\n"
+    "  }\n"
+    "}\n";
+  //EXPECT_EQ(Mat.print(),Ans);
 }
