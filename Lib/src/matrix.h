@@ -168,17 +168,21 @@ class MatrixRef : public MatrixBase<T,N>{
 
 template<typename T, int N>
 void MatrixRef<T,N>::GetString(string& str){
+  str.append("{\n");
   for (int i=0;i<N;++i){
-    str.insert(size_t{0}, "{");
     row(i).GetString(str);
-    str += "}";
   }
+  str.append("}\n");
 }
 
 template<>
 void MatrixRef<int,1>::GetString(string& str){
   for (int i=0;i<size();++i){
-    str += *(data()+start()) + ",";
+    if (i==0) str.append("{");
+    string str2 = to_string(*(data()+start()+i));
+    str.append(str2);
+    if (i+1!=size()) str.append(",");
+    if (i+1==size()) str.append("}\n");
   }
 }
 
@@ -226,6 +230,25 @@ void Matrix<T,N>::info(){
     cout << i << ", ";
   }
   cout << endl;
+}
+
+template<typename T, int N>
+void MatrixRef<T,N>::info(){
+  cout << "extents: ";
+  for (auto &i : this->desc_.extents){
+    cout << i << ", ";
+  }
+  cout << endl;
+  cout << "strides: ";
+  for (auto &i : this->desc_.strides){
+    cout << i << ", ";
+  }
+  cout << endl;
+//  cout << "elements: ";
+//  for (auto &i : data()){
+//    cout << i << ", ";
+//  }
+//  cout << endl;
 }
 
 /* matrix implementation namespace for functions 

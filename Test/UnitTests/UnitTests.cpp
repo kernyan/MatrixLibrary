@@ -121,3 +121,10 @@ TEST_F(MatrixTest, MatrixBase_Start){
   EXPECT_EQ(*(MatRef2.data() + MatRef2.start()),6);
   EXPECT_EQ(MatRef2.start(),25);
 }
+
+TEST_F(MatrixTest, MatrixRef_GetString){
+  auto MatRef = Mat.row(1);
+  string str;
+  MatRef.GetString(str);
+  cout << str;
+}
