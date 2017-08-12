@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
 TEST(Matrix, Dimension_Constructor){
 
   Matrix<int, 1> A(5);
-  EXPECT_EQ(A.size(), 0);
+  EXPECT_EQ(A.size(), 5);
   A << 1,2,3,4,5;
   EXPECT_EQ(A.size(), 5);
 }
@@ -95,6 +95,12 @@ TEST_F(MatrixTest, Matrix_ColumnAccess){
 }
 
 TEST_F(MatrixTest, Matrix_Print){
+  string Str;
+  //auto Mat2 = Mat.row(0);
+  //string Str2;
+  //Mat2.GetString(Str2);
+  //cout << Str2;
+  Mat.GetString(Str);
   string Ans =
     "{\n"
     "  {\n"
@@ -108,7 +114,7 @@ TEST_F(MatrixTest, Matrix_Print){
     "    {6,8,0,9,4}\n"
     "  }\n"
     "}\n";
-  //EXPECT_EQ(Mat.print(),Ans);
+  EXPECT_EQ(Str,Ans);
 }
 
 TEST_F(MatrixTest, MatrixBase_Start){
@@ -122,9 +128,3 @@ TEST_F(MatrixTest, MatrixBase_Start){
   EXPECT_EQ(MatRef2.start(),25);
 }
 
-TEST_F(MatrixTest, MatrixRef_GetString){
-  auto MatRef = Mat.row(1);
-  string str;
-  MatRef.GetString(str);
-  cout << str;
-}

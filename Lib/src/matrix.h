@@ -92,7 +92,7 @@ class Matrix : public MatrixBase<T,N>{
     // Matrix (double dim) = delete;
     // Matrix& operator=(const Matrix&) = delete;
 
-    virtual int size() const override {return data_.size();};
+    virtual int size() const override {return desc_.size();};
     virtual T* data() override {return data_.data();};
     vector<T>& GetVector() {return data_;};
 
@@ -109,6 +109,8 @@ class Matrix : public MatrixBase<T,N>{
     virtual int start() const override final{
       return desc_.start_;
     }
+
+    void GetString(string &str);
 
   private:
 
@@ -128,6 +130,27 @@ MatrixRef<T,N-1> Matrix<T,N>::column(int i) {
   MatrixSlice<N-1> col;
   matrixImpl::slice_dim<1>(i,desc_, col);
   return {col, data()};
+}
+
+template<typename T, int N>
+void Matrix<T,N>::GetString(string& str){
+  // TODO: Matrix's row() returns MatrixRef,to keep this N
+  if (N>1) str.append("{\n");
+  for (int i=0;i<desc_.extents[0];++i){
+    row(i).GetString(str);
+  }
+  if (N>1) str.append("}\n");
+}
+
+template<>
+void Matrix<int,1>::GetString(string& str){
+  for (int i=0;i<size();++i){
+    if (i==0) str.append("{");
+    string str2 = to_string(*(data()+start()+i));
+    str.append(str2);
+    if (i+1!=size()) str.append(",");
+    if (i+1==size()) str.append("}\n");
+  }
 }
 
 template<typename T, int N>
@@ -166,19 +189,31 @@ class MatrixRef : public MatrixBase<T,N>{
     T* ptr_;
 };
 
+static int InitN = 0;
 template<typename T, int N>
 void MatrixRef<T,N>::GetString(string& str){
-  str.append("{\n");
-  for (int i=0;i<N;++i){
+  InitN = N+1;
+  if (N>1){
+    str.append((InitN-N)*2,' ');
+    str.append("{\n");
+  }
+  for (int i=0;i<desc_.extents[0];++i){
     row(i).GetString(str);
   }
-  str.append("}\n");
+  if (N>1){
+    str.append((InitN-N)*2,' ');
+    str.append("}\n");
+  }
 }
 
 template<>
 void MatrixRef<int,1>::GetString(string& str){
+  // TODO: Fix hardcoded 3
   for (int i=0;i<size();++i){
-    if (i==0) str.append("{");
+    if (i==0){
+      str.append((InitN-1)*2,' ');
+      str.append("{");
+    }
     string str2 = to_string(*(data()+start()+i));
     str.append(str2);
     if (i+1!=size()) str.append(",");
