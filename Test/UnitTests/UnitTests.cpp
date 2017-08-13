@@ -94,12 +94,19 @@ TEST_F(MatrixTest, Matrix_ColumnAccess){
   EXPECT_EQ(MatRef(1,2), 8);
 }
 
+TEST_F(MatrixTest, MatrixRef_FromMatrix){
+  string strMatrix;
+  Mat.GetString(strMatrix);
+  
+  MatrixRef<int,3> MatRef(Mat);
+  string strMatRef;
+  MatRef.GetString(strMatRef);
+
+  EXPECT_EQ(strMatrix, strMatRef);
+}
+
 TEST_F(MatrixTest, Matrix_Print){
   string Str;
-  //auto Mat2 = Mat.row(0);
-  //string Str2;
-  //Mat2.GetString(Str2);
-  //cout << Str2;
   Mat.GetString(Str);
   string Ans =
     "{\n"
@@ -128,3 +135,14 @@ TEST_F(MatrixTest, MatrixBase_Start){
   EXPECT_EQ(MatRef2.start(),25);
 }
 
+TEST_F(MatrixTest, Matrix_MultipleDimPrint){
+  auto MatRef = Mat.row(1);
+  string strDim3;
+  string strDim2;
+
+  Mat.GetString(strDim3);
+  MatRef.GetString(strDim2);
+
+  cout << strDim3;
+  cout << strDim2;
+}

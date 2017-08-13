@@ -77,10 +77,11 @@ class MatrixBase{
 
 template <typename T, int N>
 class Matrix : public MatrixBase<T,N>{ 
-
+  friend class MatrixRef<T,N>;
   public:
 
     Matrix() = default;
+    ~Matrix(){};
 
     template<typename ...Dims>
     Matrix(Dims... dims) :
@@ -135,11 +136,13 @@ MatrixRef<T,N-1> Matrix<T,N>::column(int i) {
 template<typename T, int N>
 void Matrix<T,N>::GetString(string& str){
   // TODO: Matrix's row() returns MatrixRef,to keep this N
-  if (N>1) str.append("{\n");
-  for (int i=0;i<desc_.extents[0];++i){
-    row(i).GetString(str);
-  }
-  if (N>1) str.append("}\n");
+  MatrixRef<T,N> MatRef(*this);
+  MatRef.GetString(str);
+  // if (N>1) str.append("{\n");
+  // for (int i=0;i<desc_.extents[0];++i){
+  //   row(i).GetString(str);
+  // }
+  // if (N>1) str.append("}\n");
 }
 
 template<>
@@ -159,9 +162,15 @@ class MatrixRef : public MatrixBase<T,N>{
   public:
 
     MatrixRef() = default;
+    ~MatrixRef(){};
     MatrixRef(MatrixSlice<N> MatRef, T* ptr) :
       desc_{MatRef},
       ptr_(ptr) 
+      {};
+
+    MatrixRef(Matrix<T,N> &Mat) : 
+      desc_{Mat.desc_},
+      ptr_(Mat.data_.data())
       {};
 
     virtual int size() const override {return desc_.size();};
@@ -182,6 +191,7 @@ class MatrixRef : public MatrixBase<T,N>{
     }
 
     void GetString(string& str);
+    void GetString(int InitDim, string& str);
 
   private:
 
@@ -189,29 +199,31 @@ class MatrixRef : public MatrixBase<T,N>{
     T* ptr_;
 };
 
-static int InitN = 0;
 template<typename T, int N>
 void MatrixRef<T,N>::GetString(string& str){
-  InitN = N+1;
+  GetString(N, str);
+}
+
+template<typename T, int N>
+void MatrixRef<T,N>::GetString(int InitDim, string& str){
   if (N>1){
-    str.append((InitN-N)*2,' ');
+    str.append((InitDim-N)*2,' ');
     str.append("{\n");
   }
   for (int i=0;i<desc_.extents[0];++i){
-    row(i).GetString(str);
+    row(i).GetString(InitDim, str);
   }
   if (N>1){
-    str.append((InitN-N)*2,' ');
+    str.append((InitDim-N)*2,' ');
     str.append("}\n");
   }
 }
 
 template<>
-void MatrixRef<int,1>::GetString(string& str){
-  // TODO: Fix hardcoded 3
+void MatrixRef<int,1>::GetString(int InitDim, string& str){
   for (int i=0;i<size();++i){
     if (i==0){
-      str.append((InitN-1)*2,' ');
+      str.append((InitDim-1)*2,' ');
       str.append("{");
     }
     string str2 = to_string(*(data()+start()+i));
@@ -250,6 +262,10 @@ Matrix<T,N>& operator,(Matrix<T,N>& Mat, T value){
 
 template<typename T, int N>
 void Matrix<T,N>::info(){
+  cout << "size: ";
+  cout << desc_.size_ << endl;
+  cout << "start: ";
+  cout << desc_.start_ << endl;
   cout << "extents: ";
   for (auto &i : this->desc_.extents){
     cout << i << ", ";
@@ -258,6 +274,11 @@ void Matrix<T,N>::info(){
   cout << "strides: ";
   for (auto &i : this->desc_.strides){
     cout << i << ", ";
+  }
+  cout << endl;
+  cout << "index: ";
+  for (auto &i : data_){
+    cout << &i << ",";
   }
   cout << endl;
   cout << "elements: ";
@@ -269,6 +290,10 @@ void Matrix<T,N>::info(){
 
 template<typename T, int N>
 void MatrixRef<T,N>::info(){
+  cout << "size: ";
+  cout << desc_.size_ << endl;
+  cout << "start: ";
+  cout << desc_.start_ << endl;
   cout << "extents: ";
   for (auto &i : this->desc_.extents){
     cout << i << ", ";
@@ -279,11 +304,16 @@ void MatrixRef<T,N>::info(){
     cout << i << ", ";
   }
   cout << endl;
-//  cout << "elements: ";
-//  for (auto &i : data()){
-//    cout << i << ", ";
-//  }
-//  cout << endl;
+  cout << "index: ";
+  for (int j=0;j<size();++j){
+    cout << (data()+j) << "'";
+  }
+  cout << endl;
+  cout << "elements: ";
+  for (int j=0;j<size();++j){
+    cout << *(data()+j) << ", ";
+  }
+  cout << endl;
 }
 
 /* matrix implementation namespace for functions 
