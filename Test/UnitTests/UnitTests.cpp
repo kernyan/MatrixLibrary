@@ -17,22 +17,6 @@ TEST(Matrix, Dimension_Constructor){
   EXPECT_EQ(A.size(), 5);
 }
 
-class MatrixTest : public ::testing::Test{
-  protected:
-    virtual void SetUp(){
-      Mat = Matrix<int, 3>(2,3,5);
-      Mat << 1,2,3,4,5,
-             2,3,4,5,6,
-             7,8,1,2,3,
-
-             2,4,6,8,0,
-             4,6,8,0,2,
-             6,8,0,9,4;
-    };
-
-    Matrix<int,3> Mat;
-};
-
 TEST(Matrix, Stream_Operator){
   
   Matrix<int,1> A(9);
@@ -73,6 +57,22 @@ TEST(Matrix, Matrix_OneDimensionedOneElem){
   EXPECT_EQ(A2.size(),1);
 }
 
+class MatrixTest : public ::testing::Test{
+  protected:
+    virtual void SetUp(){
+      Mat = Matrix<int, 3>(2,3,5);
+      Mat << 1,2,3,4,5,
+             2,3,4,5,6,
+             7,8,1,2,3,
+
+             2,4,6,8,0,
+             4,6,8,0,2,
+             6,8,0,9,4;
+    };
+
+    Matrix<int,3> Mat;
+};
+
 TEST_F(MatrixTest, Matrix_ReplaceValue){
   Mat(1,2,3) = 99;
   EXPECT_EQ(Mat(1,2,3), 99); 
@@ -95,8 +95,7 @@ TEST_F(MatrixTest, Matrix_ColumnAccess){
 }
 
 TEST_F(MatrixTest, MatrixRef_FromMatrix){
-  string strMatrix;
-  Mat.GetString(strMatrix);
+  string strMatrix = Mat.GetString();
   
   MatrixRef<int,3> MatRef(Mat);
   string strMatRef;
@@ -106,8 +105,7 @@ TEST_F(MatrixTest, MatrixRef_FromMatrix){
 }
 
 TEST_F(MatrixTest, Matrix_Print){
-  string Str;
-  Mat.GetString(Str);
+  string Str = Mat.GetString();
   string Ans =
     "{\n"
     "  {\n"
@@ -136,13 +134,56 @@ TEST_F(MatrixTest, MatrixBase_Start){
 }
 
 TEST_F(MatrixTest, Matrix_MultipleDimPrint){
+  string AnsDim3 =
+    "{\n"
+    "  {\n"
+    "    {1,2,3,4,5}\n"
+    "    {2,3,4,5,6}\n"
+    "    {7,8,1,2,3}\n"
+    "  }\n"
+    "  {\n"
+    "    {2,4,6,8,0}\n"
+    "    {4,6,8,0,2}\n"
+    "    {6,8,0,9,4}\n"
+    "  }\n"
+    "}\n";
+  string AnsDim2 = 
+    "{\n"
+    "  {2,4,6,8,0}\n"
+    "  {4,6,8,0,2}\n"
+    "  {6,8,0,9,4}\n"
+    "}\n";
+
   auto MatRef = Mat.row(1);
-  string strDim3;
-  string strDim2;
+  string strDim3 = Mat.GetString();
+  string strDim2 = MatRef.GetString();
 
-  Mat.GetString(strDim3);
-  MatRef.GetString(strDim2);
+  EXPECT_EQ(AnsDim3, strDim3);
+  EXPECT_EQ(AnsDim2, strDim2);
+}
 
-  cout << strDim3;
-  cout << strDim2;
+class MatrixAlgebra : public ::testing::Test{
+  protected:
+    virtual void SetUp(){
+      Mat = Matrix<int, 2>(3,3);
+      Mat << 1,2,3,
+             4,5,6,
+             7,8,9;
+    };
+
+    Matrix<int,2> Mat;
+};
+
+TEST_F(MatrixAlgebra, Matrix_PlusEqual){
+  Mat += 1;
+  Matrix<int, 2> Mat2(3,3);
+  Mat2 << 2,3,4,5,6,7,8,9,10;
+  EXPECT_EQ(Mat2.GetString(), Mat.GetString());
+}
+
+TEST_F(MatrixAlgebra, Matrix_PlusMatrix)
+{
+  auto Mat2 = Mat + Mat;
+  Mat += Mat;
+  EXPECT_EQ(Mat.GetString(), Mat2.GetString()); 
 }

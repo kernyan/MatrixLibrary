@@ -111,7 +111,17 @@ class Matrix : public MatrixBase<T,N>{
       return desc_.start_;
     }
 
-    void GetString(string &str);
+    string GetString();
+
+    template<typename F>
+    Matrix<T,N>& apply(F f);
+
+    template<typename F>
+    Matrix<T,N>& apply(const Matrix<T,N>& m, F f);
+
+    // algebraic operators
+    Matrix<T,N>& operator+=(const T& value);
+    Matrix<T,N>& operator+=(const Matrix<T,N>& m);
 
   private:
 
@@ -134,26 +144,46 @@ MatrixRef<T,N-1> Matrix<T,N>::column(int i) {
 }
 
 template<typename T, int N>
-void Matrix<T,N>::GetString(string& str){
-  // TODO: Matrix's row() returns MatrixRef,to keep this N
+string Matrix<T,N>::GetString(){
+  string str;
   MatrixRef<T,N> MatRef(*this);
   MatRef.GetString(str);
-  // if (N>1) str.append("{\n");
-  // for (int i=0;i<desc_.extents[0];++i){
-  //   row(i).GetString(str);
-  // }
-  // if (N>1) str.append("}\n");
+  return str;
 }
 
-template<>
-void Matrix<int,1>::GetString(string& str){
-  for (int i=0;i<size();++i){
-    if (i==0) str.append("{");
-    string str2 = to_string(*(data()+start()+i));
-    str.append(str2);
-    if (i+1!=size()) str.append(",");
-    if (i+1==size()) str.append("}\n");
+template<typename T, int N>
+  template<typename F>
+  Matrix<T,N>& Matrix<T,N>::apply(F f){
+    for (auto& x : data_) f(x);
+    return *this;
   }
+
+template<typename T, int N>
+Matrix<T,N>& Matrix<T,N>::operator+=(const T& value){
+  return apply([&](T& a){a += value;});
+}
+
+template<typename T, int N>
+  template<typename F>
+  Matrix<T,N>& Matrix<T,N>::apply(const Matrix<T,N>& m, F f){
+    for (auto i = data_.begin(), j = m.data_.begin();
+        i != data_.end(); ++i, ++j){
+      f(*i,*j);
+    }
+    return *this;
+  }
+
+template<typename T, int N>
+Matrix<T,N>& Matrix<T,N>::operator+=(const Matrix<T,N> &m){
+  return apply(m, [](T& a, const T& b){a+=b;});
+}
+
+template<typename T, int N>
+Matrix<T,N> operator+(const Matrix<T,N>& a,
+    const Matrix<T,N>& b){
+  Matrix<T,N> result=a;
+  result += b;
+  return result;
 }
 
 template<typename T, int N>
@@ -191,6 +221,7 @@ class MatrixRef : public MatrixBase<T,N>{
     }
 
     void GetString(string& str);
+    string GetString();
     void GetString(int InitDim, string& str);
 
   private:
@@ -198,6 +229,13 @@ class MatrixRef : public MatrixBase<T,N>{
     MatrixSlice<N> desc_;
     T* ptr_;
 };
+
+template<typename T, int N>
+string MatrixRef<T,N>::GetString(){
+  string str;
+  GetString(N, str);
+  return str;
+}
 
 template<typename T, int N>
 void MatrixRef<T,N>::GetString(string& str){
