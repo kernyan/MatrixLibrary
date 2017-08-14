@@ -1,4 +1,8 @@
+/////////////////////////////////////////////
 // contains all the matrix library definition
+// reference: Bjarne Stroustrup, The C++ Programming Language
+// Fourth Edition, Chapter 29 "A Matrix Design"
+////////////////////////////////////////////
 
 #include <vector>
 #include <initializer_list>
@@ -123,6 +127,9 @@ class Matrix : public MatrixBase<T,N>{
     Matrix<T,N>& operator+=(const T& value);
     Matrix<T,N>& operator+=(const Matrix<T,N>& m);
 
+    Matrix<T,N>& operator-=(const T& value);
+    Matrix<T,N>& operator-=(const Matrix<T,N>& m);
+
   private:
 
     MatrixSlice<N> desc_;
@@ -164,6 +171,11 @@ Matrix<T,N>& Matrix<T,N>::operator+=(const T& value){
 }
 
 template<typename T, int N>
+Matrix<T,N>& Matrix<T,N>::operator-=(const T& value){
+  return apply([&](T& a){a -= value;});
+}
+
+template<typename T, int N>
   template<typename F>
   Matrix<T,N>& Matrix<T,N>::apply(const Matrix<T,N>& m, F f){
     for (auto i = data_.begin(), j = m.data_.begin();
@@ -179,6 +191,11 @@ Matrix<T,N>& Matrix<T,N>::operator+=(const Matrix<T,N> &m){
 }
 
 template<typename T, int N>
+Matrix<T,N>& Matrix<T,N>::operator-=(const Matrix<T,N> &m){
+  return apply(m, [](T& a, const T& b){a-=b;});
+}
+
+template<typename T, int N>
 Matrix<T,N> operator+(const Matrix<T,N>& a,
     const Matrix<T,N>& b){
   Matrix<T,N> result=a;
@@ -186,6 +203,13 @@ Matrix<T,N> operator+(const Matrix<T,N>& a,
   return result;
 }
 
+template<typename T, int N>
+Matrix<T,N> operator-(const Matrix<T,N>& a,
+    const Matrix<T,N>& b){
+  Matrix<T,N> result=a;
+  result -=  b;
+  return result;
+}
 template<typename T, int N>
 class MatrixRef : public MatrixBase<T,N>{ 
 

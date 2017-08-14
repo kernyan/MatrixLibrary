@@ -187,3 +187,10 @@ TEST_F(MatrixAlgebra, Matrix_PlusMatrix)
   Mat += Mat;
   EXPECT_EQ(Mat.GetString(), Mat2.GetString()); 
 }
+
+TEST_F(MatrixAlgebra, Matrix_MinusMatrix)
+{
+  auto Mat2 = Mat - Mat;
+  Mat -= Mat;
+  EXPECT_EQ(Mat.GetString(), Mat2.GetString()); 
+}
